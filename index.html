@@ -30,79 +30,81 @@
     </li>
 </script>
 <script>
-    var Slider = function() {
-        this._sliderImageDom = document.querySelector('.bannerImg');
-        this._sliderImageList = [
-            './img/@promotion01.jpg',
-            './img/@promotion02.jpg',
-            './img/@promotion03.jpg',
-            './img/@promotion04.jpg',
-            './img/@promotion05.jpg',
-            './img/@promotion06.jpg'
-        ];
-        this._currentIndex = 0;
-        this._numberOfSliderImage = this._sliderImageList.length;
-        this._dotStr = document.querySelector('#dotTemplate').text;
-        this._elementOfDots;
-    };
-
-    Slider.prototype._renderDots = function () {
-        var dotsStr = '';
-        for (var index = 0; index < this._numberOfSliderImage; index++) {
-            dotsStr += this._dotStr;
+    let Slider = class {
+        
+        constructor() {
+            this._index = 0;
+            this._slider = document.querySelector('.bannerImg');
+            this._imgList = [
+                './img/@promotion01.jpg',
+                './img/@promotion02.jpg',
+                './img/@promotion03.jpg',
+                './img/@promotion04.jpg',
+                './img/@promotion05.jpg',
+                './img/@promotion06.jpg'
+            ];
+            this._nextBtn = document.querySelector('.next');
+            this._prevBtn = document.querySelector('.prev');
         }
-        document.querySelector('.container').innerHTML = dotsStr;
-        this._elementOfDots = document.querySelectorAll('.dot');
-    };
 
-    Slider.prototype.onClickNextImage = function () {
-        var newIndex = (this._currentIndex >= this._numberOfSliderImage - 1) ? 0 : this._currentIndex + 1;
-        this._execute(newIndex);
-    };
+        _excute(isNext) {
+            this._offDot();
+            this._updateIndex(isNext);
+            this._updateImage();
+            this._onDot();
+        }
 
-    Slider.prototype.onClickPrevImage = function () {
-        var newIndex = (this._currentIndex <= 0) ? _numberOfSliderImage - 1 : this._currentIndex - 1;
-        this._execute(newIndex);
-    };
+        _updateIndex(isNext) {
+            if(isNext) {
+                this._index = ++this._index === this._imgList.length ? 0 : this._index;
+            }
+            else {
+                this._index = --this._index < 0 ? this._imgList.length - 1 : this._index;
+            }
+        }
 
-    Slider.prototype._execute = function (newIndex) {
-        this._offDot();
-        this._currentIndex = newIndex;
-        this._changeImage();
-        this._onDot();
-    };
+        _updateImage() {
+            this._slider.src = this._imgList[this._index];
+        }
 
-    Slider.prototype._changeImage = function () {
-        this._sliderImageDom.src = this._sliderImageList[this._currentIndex];
-    };
+        _onDot() {
+            this._dotList[this._index].classList.add('on');
+        }
 
-    Slider.prototype._onDot = function () {
-        this._elementOfDots[this._currentIndex].classList.add('on');
-    };
+        _offDot() {
+            this._dotList[this._index].classList.remove('on');
+        }
 
-    Slider.prototype._offDot = function () {
-        this._elementOfDots[this._currentIndex].classList.remove('on');
-    };
+        _renderDot() {
+            let dotsStr = '';
+            let dotTemplete = document.querySelector('#dotTemplate').text;
+            for (let index = 0; index < this._imgList.length; index++) {
+                dotsStr += dotTemplete;
+            }
+            document.querySelector('.container').innerHTML = dotsStr;
+            this._dotList = document.querySelectorAll('.dot');
+        }
 
-    Slider.prototype._setEventListener = function () {
-        document.querySelector('.prev').addEventListener("click", this.onClickPrevImage.bind(this));
-        document.querySelector('.next').addEventListener("click", this.onClickNextImage.bind(this));
-    };
+        _bindEvent() {
+            this._nextBtn.onclick = () => this._excute(true);
+            this._prevBtn.onclick = () => this._excute(false);
+        }
 
-    Slider.prototype._autoPlayImageSlide = function () {
-        setInterval(this.onClickNextImage.bind(this), 3000);
-    };
+        _playAutoChange() {
+            setInterval(() => this._excute(true), 3000);
+        }
 
-    Slider.prototype.init = function () {
-        this._setEventListener();
-        this._renderDots();
-        this._changeImage();
-        this._onDot();
-        this._autoPlayImageSlide();
+        init() {
+            this._bindEvent();
+            this._renderDot();
+            this._onDot();
+            this._updateImage();
+            this._playAutoChange();
+        }
     };
-
-    var sliderInstance = new Slider();
-    sliderInstance.init();
+    
+    let slider = new Slider();
+    slider.init();
 </script>
 </body>
 </html>
