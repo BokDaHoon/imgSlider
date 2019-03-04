@@ -30,53 +30,67 @@
     </li>
 </script>
 <script>
-    let sldier = document.querySelector('.bannerImg');
-    let nextClick = document.querySelector('.next');
-    let prevClick = document.querySelector('.prev');
-    const sliderImgList = [
-        './img/@promotion01.jpg',
-        './img/@promotion02.jpg',
-        './img/@promotion03.jpg',
-        './img/@promotion04.jpg',
-        './img/@promotion05.jpg',
-        './img/@promotion06.jpg'
-    ];
-    let index = 0;
 
-    const changeImage = function(index) {
-        sldier.src = sliderImgList[index];
-    };
+    (function() {
+        let sldier = document.querySelector('.bannerImg');
+        let nextClick = document.querySelector('.next');
+        let prevClick = document.querySelector('.prev');
+        let index = 0;
+        let dotList;
 
-    const nextImage = function() {
-        index++;
-        index = index === sliderImgList.length ? 0 : index;
-        changeImage(index);
-    };
+        const sliderImgList = [
+            './img/@promotion01.jpg',
+            './img/@promotion02.jpg',
+            './img/@promotion03.jpg',
+            './img/@promotion04.jpg',
+            './img/@promotion05.jpg',
+            './img/@promotion06.jpg'
+        ];
 
-    const prevImage = function() {
-        index--;
-        index = index === -1 ? sliderImgList.length-1 : index;
-        changeImage(index);
-    };
+        const excute = (isNext) => {
+            offDot();
+            updateIndex(isNext);
+            updateImage();
+            onDot();
+        };
 
-    const renderDot = function() {
+        const updateImage = () => sldier.src = sliderImgList[index];
+
+        const updateIndex = (isNext) => {
+            if(isNext) {
+                index = ++index === sliderImgList.length ? 0 : index;
+            }
+            else {
+                index = --index < 0 ? sliderImgList.length-1 : index;
+            }
+        };
+
+        const onDot = () => dotList[index].classList.add('on');
         
-    };
+        const offDot = () => dotList[index].classList.remove('on');
 
-    prevClick.onclick = function() { 
-        prevImage();
-    }
+        const renderDot = () => {
+            let dotsStr = '';
+            let dotTemplete = document.querySelector('#dotTemplate').text;
+            for (let index = 0; index < sliderImgList.length; index++) {
+                dotsStr += dotTemplete;
+            }
+            document.querySelector('.container').innerHTML = dotsStr;
+            dotList = document.querySelectorAll('.dot');
+        };
+        const bindEvent = () => {
+            prevClick.onclick = () => excute(false);
+            nextClick.onclick = () => excute(true);
+        };
 
-    nextClick.onclick = function() { 
-        nextImage();
-    }
-
-    const init = function() {
-        changeImage(0);
-        setInterval(nextImage, 3000);
-    }();
-
-        
+        const init = function() {
+            bindEvent();
+            renderDot();
+            onDot();
+            updateImage();
+            setInterval(() => excute(true), 3000);
+         }();
+    })();        
 </script>
 </body>
 </html>
